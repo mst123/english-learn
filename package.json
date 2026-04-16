@@ -1,0 +1,16 @@
+{
+  "name": "english-learn",
+  "version": "1.0.0",
+  "description": "先用母语写下差不多 100～150 字，记录并整理自己想说的话；随着任务的推进，逐步增加篇幅；\r 使用 AI 辅助工具将其转换成英文表达；\r 使用 AI 辅助工具将英文文字转换成语音文件；\r 跟读、朗读、直至完整背诵……",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 8088",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 8088"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vite": "^8.0.8"
+  }
+}

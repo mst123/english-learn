@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English Learn</title>
+  <style>
+    :root {
+      --bg: #f4f7ff;
+      --card-bg: #ffffff;
+      --text: #24324a;
+      --muted: #6e7c93;
+      --line: #e7ecf6;
+      --primary: #5b7cff;
+      --shadow: 0 12px 30px rgba(36, 50, 74, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at 20% 0%, #ebf1ff, var(--bg) 60%);
+      color: var(--text);
+      padding: 28px 16px;
+    }
+
+    .container {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .desc {
+      margin: 0 0 18px;
+      color: var(--muted);
+    }
+
+    .tip {
+      margin: 0 0 20px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dfe6ff;
+      background: #f8faff;
+      color: #43526a;
+      font-size: 14px;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--primary);
+      border: 1px solid #d7e0ff;
+      background: #f7f9ff;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+
+    a:hover {
+      background: #edf2ff;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>English Learn</h1>
+    <p class="desc">按日期管理你的英语学习文章，点击链接即可访问。</p>
+    <p class="tip">
+      支持两种地址：<code>/2026-04/16</code> 和 <code>/2026-04-16</code>（都会打开同一个 html 文件）。
+    </p>
+    <section id="list" class="list"></section>
+  </main>
+
+  <script type="module">
+    async function renderList() {
+      const listEl = document.getElementById("list");
+      const resp = await fetch("/api/entries");
+      const data = await resp.json();
+
+      if (!Array.isArray(data) || data.length === 0) {
+        listEl.innerHTML = "<div class='item'>暂时还没有文章，请先创建形如 <code>2026-04/16.html</code> 的文件。</div>";
+        return;
+      }
+
+      listEl.innerHTML = data.map((entry) => `
+        <article class="item">
+          <div class="title">${entry.title}</div>
+          <div class="links">
+            <!--<a href="${entry.directPath}" target="_blank">${entry.directPath}</a>-->
+            <a href="${entry.shortPath}" target="_blank">${entry.shortPath}</a>
+            <!--<a href="${entry.filePath}" target="_blank">${entry.filePath}</a>-->
+          </div>
+        </article>
+      `).join("");
+    }
+
+    renderList().catch((err) => {
+      const listEl = document.getElementById("list");
+      listEl.innerHTML = `<div class="item">加载目录失败：${err.message}</div>`;
+    });
+  </script>
+</body>
+</html>
