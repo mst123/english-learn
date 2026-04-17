@@ -94,6 +94,7 @@
       background: #edf2ff;
     }
   </style>
+  <script type="module" crossorigin src="/English-learn/assets/index-CYBDMr7f.js"></script>
 </head>
 <body>
   <main class="container">
@@ -105,43 +106,5 @@
     <section id="list" class="list"></section>
   </main>
 
-  <script type="module">
-    const pathTip = document.getElementById("path-tip");
-    if (pathTip) {
-      const base = import.meta.env.BASE_URL.replace(/\/?$/, "");
-      const sampleMonth = "2026-04";
-      const sampleDay = "16";
-      pathTip.innerHTML = `支持两种地址：<code>${base}/${sampleMonth}/${sampleDay}</code> 和 <code>${base}/${sampleMonth}-${sampleDay}</code>（都会打开同一个 html 文件）。`;
-    }
-
-    async function renderList() {
-      const listEl = document.getElementById("list");
-      const resp = import.meta.env.DEV
-        ? await fetch("/api/entries")
-        : await fetch(`${import.meta.env.BASE_URL}entries.json`);
-      const data = await resp.json();
-
-      if (!Array.isArray(data) || data.length === 0) {
-        listEl.innerHTML = "<div class='item'>暂时还没有文章，请先创建形如 <code>2026-04/16.html</code> 的文件。</div>";
-        return;
-      }
-
-      listEl.innerHTML = data.map((entry) => `
-        <article class="item">
-          <div class="title">${entry.title}</div>
-          <div class="links">
-            <!--<a href="${entry.directPath}" target="_blank">${entry.directPath}</a>-->
-            <a href="${entry.shortPath}" target="_blank">${entry.shortPath}</a>
-            <!--<a href="${entry.filePath}" target="_blank">${entry.filePath}</a>-->
-          </div>
-        </article>
-      `).join("");
-    }
-
-    renderList().catch((err) => {
-      const listEl = document.getElementById("list");
-      listEl.innerHTML = `<div class="item">加载目录失败：${err.message}</div>`;
-    });
-  </script>
 </body>
 </html>

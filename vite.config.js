@@ -48,8 +48,25 @@ function resolveFriendlyPath(pathname) {
 }
 
 function englishLearnPlugin() {
+  let viteConfig;
+
+  function withBase(paths) {
+    const raw = viteConfig?.base ?? "/";
+    const base = raw.endsWith("/") ? raw.slice(0, -1) : raw;
+    if (!base) return paths;
+    return {
+      title: paths.title,
+      directPath: `${base}${paths.directPath}`,
+      shortPath: `${base}${paths.shortPath}`,
+      filePath: `${base}${paths.filePath}`,
+    };
+  }
+
   return {
     name: "english-learn-friendly-routes",
+    configResolved(config) {
+      viteConfig = config;
+    },
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = req.url || "/";
@@ -70,13 +87,22 @@ function englishLearnPlugin() {
         next();
       });
     },
+    closeBundle() {
+      if (viteConfig.command !== "build") return;
+
+      const entries = collectEntries(viteConfig.root).map((e) => withBase(e));
+      const outFile = path.join(viteConfig.build.outDir, "entries.json");
+      fs.mkdirSync(path.dirname(outFile), { recursive: true });
+      fs.writeFileSync(outFile, JSON.stringify(entries), "utf8");
+    },
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === "build" ? "/english-learn/" : "/",
   plugins: [englishLearnPlugin()],
   server: {
     port: 8088,
     host: "0.0.0.0",
   },
-});
+}));
