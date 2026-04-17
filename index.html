@@ -100,7 +100,7 @@
     <h1>English Learn</h1>
     <p class="desc">按日期管理你的英语学习文章，点击链接即可访问。</p>
     <p class="tip" id="path-tip">
-      支持两种地址：<code>/2026-04/16</code> 和 <code>/2026-04-16</code>（都会打开同一个 html 文件）。
+      当前仅提供稳定地址：<code>/2026-04/16.html</code>。
     </p>
     <section id="list" class="list"></section>
   </main>
@@ -111,7 +111,7 @@
       const base = import.meta.env.BASE_URL.replace(/\/?$/, "");
       const sampleMonth = "2026-04";
       const sampleDay = "16";
-      pathTip.innerHTML = `支持两种地址：<code>${base}/${sampleMonth}/${sampleDay}</code> 和 <code>${base}/${sampleMonth}-${sampleDay}</code>（都会打开同一个 html 文件）。`;
+      pathTip.innerHTML = `当前仅提供稳定地址：<code>${base}/${sampleMonth}/${sampleDay}.html</code>。`;
     }
 
     async function renderList() {
@@ -130,9 +130,7 @@
         <article class="item">
           <div class="title">${entry.title}</div>
           <div class="links">
-            <!--<a href="${entry.directPath}" target="_blank">${entry.directPath}</a>-->
-            <a href="${entry.shortPath}" target="_blank">${entry.shortPath}</a>
-            <!--<a href="${entry.filePath}" target="_blank">${entry.filePath}</a>-->
+            <a href="${entry.filePath}" target="_blank">${entry.filePath}</a>
           </div>
         </article>
       `).join("");
