@@ -5,6 +5,40 @@ import { defineConfig } from "vite";
 const DATE_DIR_REGEX = /^\d{4}-\d{2}$/;
 const DATE_FILE_REGEX = /^\d{1,2}\.html$/;
 
+function copyDirRecursive(src, dest) {
+  if (!fs.existsSync(src)) return;
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const from = path.join(src, entry.name);
+    const to = path.join(dest, entry.name);
+    if (entry.isDirectory()) copyDirRecursive(from, to);
+    else fs.copyFileSync(from, to);
+  }
+}
+
+function copyDateHtmlAndAssetsToDist(rootDir, outDir) {
+  for (const item of fs.readdirSync(rootDir, { withFileTypes: true })) {
+    if (!item.isDirectory() || !DATE_DIR_REGEX.test(item.name)) continue;
+
+    const srcMonthDir = path.join(rootDir, item.name);
+    const destMonthDir = path.join(outDir, item.name);
+    fs.mkdirSync(destMonthDir, { recursive: true });
+
+    for (const file of fs.readdirSync(srcMonthDir, { withFileTypes: true })) {
+      if (!file.isFile() || !DATE_FILE_REGEX.test(file.name)) continue;
+      fs.copyFileSync(
+        path.join(srcMonthDir, file.name),
+        path.join(destMonthDir, file.name),
+      );
+    }
+  }
+
+  const assestsDir = path.join(rootDir, "assests");
+  if (fs.existsSync(assestsDir)) {
+    copyDirRecursive(assestsDir, path.join(outDir, "assests"));
+  }
+}
+
 function collectEntries(rootDir) {
   const result = [];
   const items = fs.readdirSync(rootDir, { withFileTypes: true });
@@ -90,8 +124,12 @@ function englishLearnPlugin() {
     closeBundle() {
       if (viteConfig.command !== "build") return;
 
-      const entries = collectEntries(viteConfig.root).map((e) => withBase(e));
-      const outFile = path.join(viteConfig.build.outDir, "entries.json");
+      const outDir = viteConfig.build.outDir;
+      const rootDir = viteConfig.root;
+      copyDateHtmlAndAssetsToDist(rootDir, outDir);
+
+      const entries = collectEntries(rootDir).map((e) => withBase(e));
+      const outFile = path.join(outDir, "entries.json");
       fs.mkdirSync(path.dirname(outFile), { recursive: true });
       fs.writeFileSync(outFile, JSON.stringify(entries), "utf8");
     },
